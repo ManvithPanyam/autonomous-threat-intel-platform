@@ -1,0 +1,26 @@
+# env
+.env
+.venv/
+venv/
+
+# python
+__pycache__/
+*.pyc
+.pytest_cache/
+.mypy_cache/
+
+# editors
+.vscode/
+.idea/
+
+# os
+.DS_Store
+Thumbs.db
+
+# local artifacts
+*.log
+.coverage
+htmlcov/
+
+# docker
+**/.env
