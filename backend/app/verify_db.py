@@ -7,6 +7,7 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from sqlalchemy.orm import Session
 from app.db.session import engine, SessionLocal
 from app.models import Base, Case, Alert, IOC, Enrichment, ContainmentAction
+from app.services.ioc import get_or_create_ioc
 
 def test_database_flow():
     print("Initializing test database connection...")
@@ -49,19 +50,9 @@ def test_database_flow():
         db.refresh(alert)
         print(f"   Alert created with ID: {alert.id}")
 
-        print("3. Parsing and Normalizing IOC...")
+        print("3. Parsing, Normalizing, and Storing IOC...")
         raw_ip = "198.51.100[.]42"
-        # Normalize: strip defanging brackets
-        normalized_ip = raw_ip.replace("[", "").replace("]", "").strip()
-        print(f"   Normalized '{raw_ip}' -> '{normalized_ip}'")
-        
-        # Check uniqueness & insert
-        ioc = db.query(IOC).filter_by(ioc_type="ip", value=normalized_ip).first()
-        if not ioc:
-            ioc = IOC(ioc_type="ip", value=normalized_ip)
-            db.add(ioc)
-            db.commit()
-            db.refresh(ioc)
+        ioc = get_or_create_ioc(db, "ip", raw_ip)
         
         # Link Alert to IOC
         alert.iocs.append(ioc)
@@ -89,15 +80,45 @@ def test_database_flow():
             case_id=case.id,
             action_type="block_ip",
             status="pending",
-            input_parameters={"ip_address": normalized_ip}
+            input_parameters={"ip_address": ioc.value}
         )
         db.add(action)
         db.commit()
         db.refresh(action)
         print(f"   Containment Action logged in pending status. ID: {action.id}")
 
+        print("6. Verifying Normalization and Deduplication Logic (ADR 0004)...")
+        
+        # Test Case 1: Same IP already exists in DB
+        dup_ip = get_or_create_ioc(db, "ip", "198.51.100.42")
+        assert dup_ip.id == ioc.id
+        print("   ✓ Exact IP match correctly deduplicated.")
+
+        dup_ip_defanged = get_or_create_ioc(db, "ip", "198.51.100[.]42  ")
+        assert dup_ip_defanged.id == ioc.id
+        print("   ✓ Defanged and padded IP match correctly deduplicated.")
+
+        # Test Case 2: Mixed-case domain and protocol normalization
+        domain_1 = get_or_create_ioc(db, "domain", "MALICIOUS[.]com")
+        domain_2 = get_or_create_ioc(db, "domain", "https://malicious.com/some/path")
+        assert domain_1.value == "malicious.com"
+        assert domain_2.id == domain_1.id
+        print("   ✓ Mixed-case, defanged domain and URL paths successfully resolved to single IOC domain record.")
+
+        # Test Case 3: Mixed-case hash deduplication
+        hash_1 = get_or_create_ioc(db, "hash_sha256", "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855")
+        hash_2 = get_or_create_ioc(db, "hash_sha256", "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855")
+        assert hash_1.value == "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        assert hash_2.id == hash_1.id
+        print("   ✓ Upper and lower case hashes successfully resolved to single lowercase hash record.")
+
+        # Total unique IOC count check
+        total_iocs = db.query(IOC).count()
+        assert total_iocs == 3  # The IP, the domain, and the hash
+        print(f"   ✓ Total unique IOC count matches expected: {total_iocs}")
+
         # Verification Queries
-        print("\n--- Running Verification Queries ---")
+        print("\n--- Running Relation Verification Queries ---")
         queried_case = db.query(Case).filter_by(id=case.id).first()
         assert queried_case is not None
         assert len(queried_case.alerts) == 1
@@ -120,7 +141,7 @@ def test_database_flow():
         assert queried_case.containment_actions[0].action_type == "block_ip"
         print("   ✓ Case -> Containment Actions relationship validated.")
         
-        print("\n🎉 DATABASE FLOW VERIFICATION SUCCESSFUL!")
+        print("\n🎉 DATABASE & DEDUPLICATION FLOW VERIFICATION SUCCESSFUL!")
 
     except Exception as e:
         print(f"\n❌ VERIFICATION FAILED: {str(e)}")
