@@ -4,6 +4,8 @@ An autonomous threat intelligence and response (SOAR) platform that ingests raw 
 
 ## Build Progress
 
+- **[Phase 0: Project Genesis](file:///home/mannu/projects/autonomous-threat-intel-platform/docs/journal/00-project-genesis.md)**
+  * Conceived a decoupled SOAR-style orchestration backend instead of a standard VM-based SOC lab to emphasize software engineering design patterns, asynchronous queues, database transactions, and AI-assisted synthesis.
 - **[Phase 1: Setup](file:///home/mannu/projects/autonomous-threat-intel-platform/docs/journal/phase-01-setup.md)**
   * Containerized the entire stack using Docker Compose (FastAPI, Postgres, Redis, Celery) to ensure local parity with target deployment. Resolved WSL2 socket integration hurdles to bind Docker services directly to the local distribution namespace.
 - **[Phase 2: Architecture](file:///home/mannu/projects/autonomous-threat-intel-platform/docs/journal/phase-02-architecture.md)**
