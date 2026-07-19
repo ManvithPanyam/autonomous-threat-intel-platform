@@ -10,7 +10,8 @@ An autonomous threat intelligence and response (SOAR) platform that ingests raw 
   * Containerized the entire stack using Docker Compose (FastAPI, Postgres, Redis, Celery) to ensure local parity with target deployment. Resolved WSL2 socket integration hurdles to bind Docker services directly to the local distribution namespace.
 - **[Phase 2: Architecture](file:///home/mannu/projects/autonomous-threat-intel-platform/docs/journal/phase-02-architecture.md)**
   * Defined a Pydantic-validated JSON alert ingestion schema and set up a Human-in-the-Loop (HITL) approval model for containment responses (IP blocking, host isolation, auto-ticketing) to mitigate false-positive service disruptions.
-- [ ] Phase 3: Database & Models
+- **[Phase 3: Database & Models](file:///home/mannu/projects/autonomous-threat-intel-platform/docs/journal/phase-03-database.md)**
+  * Implemented a fully normalized relational database schema (Cases, Alerts, IOCs, Enrichments, ContainmentActions) using SQLAlchemy. Enforced unique constraints, pre-insertion IOC normalization, and historic enrichment timelines to track reputation changes over time.
 - [ ] Phase 4: Ingestion API
 - [ ] Phase 5: Async Enrichment Worker
 - [ ] Phase 6: MITRE ATT&CK Mapper
