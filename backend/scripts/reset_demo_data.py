@@ -4,7 +4,8 @@ from datetime import datetime, timezone
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from app.db.session import SessionLocal
+from app.db.session import engine, SessionLocal
+from app.models.base import Base
 from app.models.case import Case
 from app.models.alert import Alert
 from app.models.ioc import IOC
@@ -17,6 +18,7 @@ from app.models.llm_log import LLMPromptLog
 
 
 def reset_and_seed_demo_data():
+    Base.metadata.create_all(bind=engine)
     db = SessionLocal()
     try:
         print("[RESET] Cleaning existing database records for demo reset...")
