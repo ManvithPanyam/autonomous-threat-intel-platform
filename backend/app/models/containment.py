@@ -13,7 +13,8 @@ class ContainmentAction(Base):
     action_type: Mapped[str] = mapped_column(String(50), nullable=False)  # block_ip, isolate_host, ticket
     target: Mapped[str | None] = mapped_column(String(255), nullable=True)
     status: Mapped[str] = mapped_column(String(50), default="pending")  # pending, approved, executing, executed, failed, denied
-    input_parameters: Mapped[dict] = mapped_column(JSON().with_variant(JSONB, "postgresql"), nullable=False)
+    input_parameters: Mapped[dict | None] = mapped_column(JSON().with_variant(JSONB, "postgresql"), nullable=True, default=dict)
+    mock_result: Mapped[dict | None] = mapped_column(JSON().with_variant(JSONB, "postgresql"), nullable=True)
     requested_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
     approved_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
     denied_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
