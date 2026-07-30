@@ -1,4 +1,5 @@
 import os
+import socket
 from dotenv import load_dotenv
 
 # Load env file in case it is run from command line directly
@@ -13,5 +14,12 @@ class Settings:
     VT_API_KEY: str = os.getenv("VT_API_KEY")
     ABUSEIPDB_API_KEY: str = os.getenv("ABUSEIPDB_API_KEY")
     SHODAN_API_KEY: str = os.getenv("SHODAN_API_KEY")
+
+    def __init__(self):
+        if "postgres:5432" in self.DATABASE_URL and not os.getenv("DATABASE_URL"):
+            try:
+                socket.gethostbyname("postgres")
+            except socket.gaierror:
+                self.DATABASE_URL = "sqlite:///./threatintel.db"
 
 settings = Settings()
