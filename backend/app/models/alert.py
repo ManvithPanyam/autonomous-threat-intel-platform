@@ -1,5 +1,5 @@
 from datetime import datetime
-from sqlalchemy import String, Text, DateTime, ForeignKey, func
+from sqlalchemy import String, Text, DateTime, ForeignKey, func, JSON
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from typing import List
@@ -15,7 +15,7 @@ class Alert(Base):
     severity: Mapped[str] = mapped_column(String(50), nullable=False)
     title: Mapped[str] = mapped_column(String(255), nullable=False)
     description: Mapped[str | None] = mapped_column(Text, nullable=True)
-    raw_payload: Mapped[dict] = mapped_column(JSONB, nullable=False)
+    raw_payload: Mapped[dict] = mapped_column(JSON().with_variant(JSONB, "postgresql"), nullable=False)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
 
     # Relationships
