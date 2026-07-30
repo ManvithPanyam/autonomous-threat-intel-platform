@@ -21,6 +21,22 @@ Thumbs.db
 *.log
 .coverage
 htmlcov/
+*.db
+backend/*.db
 
 # docker
 **/.env
+
+# Personal & Prep Documentation
+docs/journal/
+docs/interview_prep.md
+docs/resume_bullets.md
+docs/project_explained_simply.md
+docs/demo_script.md
+autonomous_threat_intel_platform_analysis.md
+
+# Scratch files & screenshots
+action_modal_ss3
+action_toast_ss4
+case_detail_ss2
+case_queue_ss1
