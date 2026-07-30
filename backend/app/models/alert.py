@@ -24,3 +24,7 @@ class Alert(Base):
         secondary="alert_iocs",
         back_populates="alerts"
     )
+    mitre_techniques: Mapped[List["MITRETechnique"]] = relationship(
+        secondary="alert_mitre_techniques",
+        back_populates="alerts"
+    )
