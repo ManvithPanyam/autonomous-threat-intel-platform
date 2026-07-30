@@ -11,10 +11,13 @@ class ContainmentAction(Base):
     id: Mapped[int] = mapped_column(primary_key=True)
     case_id: Mapped[int] = mapped_column(ForeignKey("cases.id", ondelete="CASCADE"), nullable=False)
     action_type: Mapped[str] = mapped_column(String(50), nullable=False)  # block_ip, isolate_host, ticket
-    status: Mapped[str] = mapped_column(String(50), default="pending")  # pending, approved, executing, executed, failed
+    target: Mapped[str | None] = mapped_column(String(255), nullable=True)
+    status: Mapped[str] = mapped_column(String(50), default="pending")  # pending, approved, executing, executed, failed, denied
     input_parameters: Mapped[dict] = mapped_column(JSON().with_variant(JSONB, "postgresql"), nullable=False)
     requested_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
     approved_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    denied_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    denial_reason: Mapped[str | None] = mapped_column(String(500), nullable=True)
     executed_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
     operator_email: Mapped[str | None] = mapped_column(String(255), nullable=True)
 
