@@ -2,7 +2,7 @@
 
 ## Context
 
-During a post-Phase-9 review of the demo recording (`docs/demo_recording.webp`), the recording was found to be entirely invalid — all frames showed a "Connection Error / Failed to fetch" state in the React dashboard, meaning the backend container was not reachable when the recording was made.
+During a post-Phase-9 review of the initial demo recording, the recording was found to be invalid — all frames showed a "Connection Error / Failed to fetch" state in the React dashboard, meaning the backend container was not reachable when the recording was made.
 
 Additionally, the `docker-compose.yml` did not declare a `celery_worker` service. The worker was only started manually during development sessions, meaning any reviewer performing a fresh `docker compose up --build -d` would have a running stack with no Celery workers — silently breaking async enrichment and containment execution.
 
