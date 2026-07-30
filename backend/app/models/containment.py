@@ -20,15 +20,8 @@ class ContainmentAction(Base):
     denied_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
     denial_reason: Mapped[str | None] = mapped_column(String(500), nullable=True)
     executed_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    operator_id: Mapped[str | None] = mapped_column(String(255), nullable=True)
     operator_email: Mapped[str | None] = mapped_column(String(255), nullable=True)
-
-    @property
-    def operator_id(self):
-        return self.operator_email
-
-    @operator_id.setter
-    def operator_id(self, value):
-        self.operator_email = value
 
     # Relationships
     case: Mapped["Case"] = relationship(back_populates="containment_actions")
