@@ -2,6 +2,7 @@ from datetime import datetime
 from sqlalchemy import String, DateTime, ForeignKey, func, JSON
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import Mapped, mapped_column, relationship
+from typing import List
 from app.models.base import Base
 
 class ContainmentAction(Base):
@@ -19,3 +20,4 @@ class ContainmentAction(Base):
 
     # Relationships
     case: Mapped["Case"] = relationship(back_populates="containment_actions")
+    audit_logs: Mapped[List["AuditLog"]] = relationship(back_populates="containment_action")
