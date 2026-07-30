@@ -81,6 +81,9 @@ class TestPhase6(unittest.TestCase):
             case = self.db.query(Case).filter(Case.id == alert.case_id).first()
             self.assertIsNotNone(case)
             
+            map_alert_to_mitre_techniques(self.db, alert)
+            calculate_case_score(self.db, case.id)
+
             # Score = base (3) + MITRE lateral movement weight (3) = 6 (Medium)
             self.assertEqual(case.score, 6)
             self.assertEqual(case.severity, "medium")
@@ -113,6 +116,9 @@ class TestPhase6(unittest.TestCase):
             case = self.db.query(Case).filter(Case.id == alert.case_id).first()
             self.assertIsNotNone(case)
             
+            map_alert_to_mitre_techniques(self.db, alert)
+            calculate_case_score(self.db, case.id)
+
             # Score = base (6) + MITRE exfiltration weight (4) = 10 (High)
             self.assertEqual(case.score, 10)
             self.assertEqual(case.severity, "high")
