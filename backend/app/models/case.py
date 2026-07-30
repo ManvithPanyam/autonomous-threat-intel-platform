@@ -25,6 +25,14 @@ class Case(Base):
         onupdate=func.now()
     )
 
+    @property
+    def score(self):
+        return self.severity_score
+
+    @score.setter
+    def score(self, value):
+        self.severity_score = value
+
     # Relationships
     alerts: Mapped[List["Alert"]] = relationship(back_populates="case")
     containment_actions: Mapped[List["ContainmentAction"]] = relationship(back_populates="case")

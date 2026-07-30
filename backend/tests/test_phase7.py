@@ -125,9 +125,11 @@ class TestPhase7(unittest.TestCase):
         self.assertIn("C2 beaconing detected", result.summary_markdown)
         self.assertEqual(result.tokens_used, 150)
 
+    @patch("app.workers.summarizer_tasks.SessionLocal")
     @patch("app.workers.summarizer_tasks.get_llm_provider")
-    def test_summarize_case_task_success(self, mock_get_provider):
+    def test_summarize_case_task_success(self, mock_get_provider, mock_session_local):
         """Verify summarize_case_task executes, updates Case.analyst_summary and writes DB log."""
+        mock_session_local.side_effect = lambda: SessionLocal(bind=self.connection)
         mock_provider = MagicMock()
         mock_provider.provider_name = "gemini"
         mock_provider.summarize_case = AsyncMock(
@@ -164,10 +166,12 @@ class TestPhase7(unittest.TestCase):
         self.assertEqual(log.provider, "gemini")
         self.assertEqual(log.tokens_used, 120)
 
+    @patch("app.workers.summarizer_tasks.SessionLocal")
     @patch("app.workers.summarizer_tasks.get_fallback_provider")
     @patch("app.workers.summarizer_tasks.get_llm_provider")
-    def test_summarize_case_task_fallback(self, mock_get_provider, mock_get_fallback):
+    def test_summarize_case_task_fallback(self, mock_get_provider, mock_get_fallback, mock_session_local):
         """Verify task falls back to secondary provider when primary fails."""
+        mock_session_local.side_effect = lambda: SessionLocal(bind=self.connection)
         primary_mock = MagicMock()
         primary_mock.provider_name = "gemini"
         primary_mock.summarize_case = AsyncMock(side_effect=RuntimeError("500 Server Error"))

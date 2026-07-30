@@ -73,11 +73,10 @@ def get_or_create_mitre_technique(db: Session, technique_id: str, name: str, tac
     """
     tech = db.query(MITRETechnique).filter_by(technique_id=technique_id).first()
     if not tech:
-        db.begin_nested()
         try:
             tech = MITRETechnique(technique_id=technique_id, name=name, tactic=tactic)
             db.add(tech)
-            db.commit()
+            db.flush()
         except Exception:
             db.rollback()
             tech = db.query(MITRETechnique).filter_by(technique_id=technique_id).first()
